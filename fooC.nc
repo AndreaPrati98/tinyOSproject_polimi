@@ -20,18 +20,16 @@ implementation {
 
   bool locked;
   uint16_t counter = 0;
-  bool mask[3] = {0, 0, 0}; 
+  bool mask[3] = {0, 0, 0};  // service variable for printing the led status
   
   event void Boot.booted() {
     call AMControl.start();
-  	// start the radio in our mode
+  	// start the radio
   }
 
 // -----------------------------------------------------
   event void AMControl.startDone(error_t err) {
-    // we started our application
     if (err == SUCCESS) {
-    
       	// here we setup the timers according with the nodeID
 		switch(TOS_NODE_ID) {
 		
@@ -51,7 +49,7 @@ implementation {
 				break;
 			
 			default:
-				call Timer.startPeriodic( 2000 ); // 0.5 Hz
+				call Timer.startPeriodic( 2000 ); // 0.5 Hz - default (example) option not used in the project
 				printf("\n Too many nodes \n");
 				break;
 			
@@ -62,6 +60,7 @@ implementation {
       call AMControl.start();
     }
   }
+// -----------------------------------------------------
 
   event void AMControl.stopDone(error_t err) {
     // do nothing
@@ -69,7 +68,7 @@ implementation {
 // -----------------------------------------------------
   
   event void Timer.fired() {
-   
+
     if (locked) {
       return;
       
@@ -86,6 +85,7 @@ implementation {
       	}
     }
   }
+// -----------------------------------------------------
 
   event void AMSend.sendDone(message_t* bufPtr, error_t error) {
     if (&packet == bufPtr) {
@@ -94,8 +94,7 @@ implementation {
   }
 
   event message_t* Receive.receive(message_t* bufPtr, void* payload, uint8_t len) {
-    // if counter mod 10 == 0 turn off all the leds
-    // receved msg -> increase the counter
+    // if we receive a msg, we increase the counter
     counter++;
     
     
@@ -105,6 +104,7 @@ implementation {
       fooMessage_t* rcm = (fooMessage_t*)payload;
       
       if ( (rcm -> counter % 10) == 0) {
+        // if counter mod 10 == 0, turn off all the leds
 		call Leds.led0Off();
 		call Leds.led1Off();
 		call Leds.led2Off();
@@ -112,7 +112,7 @@ implementation {
 		mask[1] = 0;
 		mask[2] = 0;
 		
-      } if( (rcm -> nodeID) == 1) {
+      } else if( (rcm -> nodeID) == 1) {
       	call Leds.led0Toggle();
 		mask[0] = !mask[0];
 		
@@ -125,13 +125,12 @@ implementation {
 		mask[2] = !mask[2];
 		
       } else {
-      	printf("\n\n ¯\_(ツ)_/¯ \n\n");
+      	printf("\n\n ¯\_(ツ)_/¯ \n\n"); //easter egg
       
       }
       
-      //here we print the nodeID and the attached status
+      //here we print the nodeID and the attached status to debug and take the result for submiting
       printf("Sender NodeID: %d, CounterMsg: %d, Mote status: %d%d%d\n", rcm -> nodeID, rcm -> counter, mask[2], mask[1], mask[0]);
-      
       
       return bufPtr;
     }
