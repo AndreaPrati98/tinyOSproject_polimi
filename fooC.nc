@@ -1,4 +1,3 @@
- 
 #include "Timer.h"
 #include "foo.h"
 #include "printf.h"
@@ -35,17 +34,17 @@ implementation {
 		
 			case 1:
 				call Timer.startPeriodic( 1000 ); // 1 Hz
-				printf("\n NodeID: %d\n", TOS_NODE_ID);
+				//printf("\n NodeID: %d\n", TOS_NODE_ID);
 				break;	
 			
 			case 2:
 				call Timer.startPeriodic( 333 ); // 3 Hz
-				printf("\n NodeID: %d\n", TOS_NODE_ID);
+				//printf("\n NodeID: %d\n", TOS_NODE_ID);
 				break;
 		
 			case 3:
 				call Timer.startPeriodic( 200 ); // 5 Hz
-				printf("\n NodeID: %d\n", TOS_NODE_ID);
+				//printf("\n NodeID: %d\n", TOS_NODE_ID);
 				break;
 			
 			default:
@@ -129,8 +128,10 @@ implementation {
       
       }
       
-      //here we print the nodeID and the attached status to debug and take the result for submiting
-      printf("Sender NodeID: %d, CounterMsg: %d, Mote status: %d%d%d\n", rcm -> nodeID, rcm -> counter, mask[2], mask[1], mask[0]);
+      if(TOS_NODE_ID==2){
+		  //here we print the nodeID and the attached status to debug and take the result for submiting
+		  printf("Sender NodeID: %d, CounterMsg: %d, Mote status: %d%d%d\n", rcm -> nodeID, rcm -> counter, mask[2], mask[1], mask[0]);
+	  }
       
       return bufPtr;
     }
@@ -140,7 +141,3 @@ implementation {
 
 
 }
-
-
-
-
